@@ -417,6 +417,7 @@ var LazyAsset = function (_React$Component) {
 
             if (this.props.mode === "natural") {
                 extraStyles.paddingBottom = this.props.images[0].h / this.props.images[0].w * 100 + '%';
+                extraStyles.height = "auto";
             }
             if (this.props.placeholder) {
                 extraStyles.backgroundImage = 'url(' + this.props.placeholder + ')';

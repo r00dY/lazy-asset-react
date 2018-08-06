@@ -101,6 +101,7 @@ class LazyAsset extends React.Component {
 
         if (this.props.mode === "natural") {
             extraStyles.paddingBottom = `${(this.props.images[0].h / this.props.images[0].w * 100)}%`;
+            extraStyles.height = "auto";
         }
         if (this.props.placeholder) {
             extraStyles.backgroundImage = `url(${this.props.placeholder})`;
@@ -109,7 +110,7 @@ class LazyAsset extends React.Component {
             extraStyles.backgroundColor = this.props.backgroundColor;
         }
 
-        return <div className={`LazyAsset ${this.props.className}`} style={{...styles.LazyAsset, ...this.props.style}}>
+        return <div className={`LazyAsset ${this.props.className}`} style={ { ...styles.LazyAsset, ...this.props.style} }>
 
             <VisibilitySensor onChange={this.handleVisibilityChange}>
 
