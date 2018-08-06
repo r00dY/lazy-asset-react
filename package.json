@@ -19,5 +19,16 @@
     "@storybook/addons": "^3.4.8",
     "babel-core": "^6.26.3",
     "babel-runtime": "^6.26.0"
-  }
+  },
+  "version": "0.1.0",
+  "main": "LazyAsset.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/r00dY/lazy-asset-react.git"
+  },
+  "author": "Andrzej Dąbrowski <a.r.dabrowski@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/r00dY/lazy-asset-react/issues"
+  },
+  "homepage": "https://github.com/r00dY/lazy-asset-react#readme"
 }
