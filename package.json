@@ -25,7 +25,7 @@
     "babel-runtime": "^6.26.0",
     "react-datepicker": "^1.6.0"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "dist/LazyAsset.js",
   "repository": {
     "type": "git",
