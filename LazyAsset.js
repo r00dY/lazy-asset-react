@@ -1,6 +1,6 @@
 import React from "react";
-import VisibilitySensor from 'react-visibility-sensor';
 import PropTypes from 'prop-types';
+import VisibilitySensor from 'react-visibility-sensor';
 
 /**
  * TODO:
