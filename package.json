@@ -1,0 +1,23 @@
+{
+  "name": "lazy-asset-react",
+  "description": "React port of LazyAsset library",
+  "license": "MIT",
+  "scripts": {
+    "storybook": "start-storybook -p 6006 -s ./stories/public",
+    "build-storybook": "build-storybook"
+  },
+  "dependencies": {
+    "prop-types": "^15.6.2",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-visibility-sensor": "^3.11.1"
+  },
+  "devDependencies": {
+    "@storybook/react": "^3.4.8",
+    "@storybook/addon-actions": "^3.4.8",
+    "@storybook/addon-links": "^3.4.8",
+    "@storybook/addons": "^3.4.8",
+    "babel-core": "^6.26.3",
+    "babel-runtime": "^6.26.0"
+  }
+}
