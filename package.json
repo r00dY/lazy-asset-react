@@ -7,11 +7,10 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "babel-preset-es2015": "^6.24.1",
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
-    "react-visibility-sensor": "^3.11.1"
+    "react-visibility-sensor": "^5.0.2"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^3.4.8",
@@ -23,7 +22,7 @@
     "babel-loader": "^7.1.5",
     "babel-preset-react": "^6.24.1",
     "babel-runtime": "^6.26.0",
-    "react-datepicker": "^1.6.0"
+    "babel-preset-es2015": "^6.24.1"
   },
   "version": "0.1.2",
   "main": "dist/LazyAsset.js",

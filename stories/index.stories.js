@@ -164,7 +164,7 @@ class LazyAssetStory__LoadOnScroll extends React.Component {
                     sizes={"100vw"}
                     images={[
                         {
-                            url: `https://placeholdit.co//i/555x${300 + i*10}`,
+                            url: `//via.placeholder.com/555x${300 + i*10}`,
                             w: 555,
                             h: 300 + i*10
                         }
@@ -177,6 +177,7 @@ class LazyAssetStory__LoadOnScroll extends React.Component {
 
                     load={true}
                     loadWhenInViewport={true}
+                    offset={this.props.offset}
                 />
             )}
 
@@ -186,4 +187,5 @@ class LazyAssetStory__LoadOnScroll extends React.Component {
 
 storiesOf('LazyAsset', module)
     .add('options', () => <LazyAssetStory__Options/>)
-    .add('load on scroll', () => <LazyAssetStory__LoadOnScroll/>);
+    .add('load on scroll', () => <LazyAssetStory__LoadOnScroll/>)
+    .add('load on scroll (with 100vh offset)', () => <LazyAssetStory__LoadOnScroll offset={{top: -window.innerHeight, bottom: -window.innerHeight}}/>);

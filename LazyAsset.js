@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from 'prop-types';
 import VisibilitySensor from 'react-visibility-sensor';
 
+
 /**
  * TODO:
  *
@@ -9,7 +10,8 @@ import VisibilitySensor from 'react-visibility-sensor';
  * - contain mode
  * - IE / Edge fallbacks
  * - onLoad callbacks
- *
+ * - picture (different images and modes per media query)
+ * - lazy video
  */
 
 const styles = {
@@ -45,7 +47,6 @@ const styles = {
         backgroundSize: "cover"
     }
 };
-
 
 class LazyAsset extends React.Component {
 
@@ -112,7 +113,7 @@ class LazyAsset extends React.Component {
 
         return <div className={`LazyAsset ${this.props.className}`} style={ { ...styles.LazyAsset, ...this.props.style} }>
 
-            <VisibilitySensor onChange={this.handleVisibilityChange}>
+            <VisibilitySensor onChange={this.handleVisibilityChange} partialVisibility={true} offset={this.props.offset}>
 
                 <div className={"LazyAsset__Wrapper"} style={{...styles.LazyAsset__Wrapper, ...extraStyles}}>
 
@@ -155,6 +156,7 @@ LazyAsset.propTypes = {
     images: PropTypes.arrayOf(PropTypes.object),
     loaded: PropTypes.bool,
     backgroundColor: PropTypes.string,
+    offset: PropTypes.object
 };
 
 LazyAsset.defaultProps = {
@@ -166,7 +168,8 @@ LazyAsset.defaultProps = {
     preload: false,
     images: [],
     loaded: false,
-    backgroundColor: "lightgrey"
+    backgroundColor: "lightgrey",
+    offset: { top: 0, bottom: 0 }
 };
 
 
