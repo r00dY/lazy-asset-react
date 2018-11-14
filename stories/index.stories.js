@@ -164,7 +164,7 @@ class LazyAssetStory__LoadOnScroll extends React.Component {
                     sizes={"100vw"}
                     images={[
                         {
-                            url: `https://placeholdit.co//i/555x${300 + i*10}`,
+                            url: `https://via.placeholder.com/555x${300 + i*10}`,
                             w: 555,
                             h: 300 + i*10
                         }

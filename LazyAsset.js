@@ -112,9 +112,7 @@ class LazyAsset extends React.Component {
 
         return <div className={`LazyAsset ${this.props.className}`} style={ { ...styles.LazyAsset, ...this.props.style} }>
 
-            <VisibilitySensor onChange={this.handleVisibilityChange}>
-
-                <div className={"LazyAsset__Wrapper"} style={{...styles.LazyAsset__Wrapper, ...extraStyles}}>
+                <div className={"LazyAsset__Wrapper"} style={{...styles.LazyAsset__Wrapper, ...extraStyles}} ref={this.wrapper}>
 
                     <div className={"LazyAsset__WrapperOverflow"}
                          style={{...styles.LazyAsset__WrapperOverflow, transition: `opacity ${this.props.animationTime}s`, opacity: this.state.status === 3 ? 1 : 0}}>
@@ -134,9 +132,6 @@ class LazyAsset extends React.Component {
                     {this.props.children}
 
                 </div>
-
-            </VisibilitySensor>
-
         </div>
     }
 }
