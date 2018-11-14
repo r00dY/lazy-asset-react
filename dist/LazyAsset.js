@@ -430,25 +430,21 @@ var LazyAsset = function (_React$Component) {
                 'div',
                 { className: 'LazyAsset ' + this.props.className, style: _extends({}, styles.LazyAsset, this.props.style) },
                 _react2.default.createElement(
-                    _reactVisibilitySensor2.default,
-                    { onChange: this.handleVisibilityChange },
+                    'div',
+                    { className: "LazyAsset__Wrapper", style: _extends({}, styles.LazyAsset__Wrapper, extraStyles), ref: this.wrapper },
                     _react2.default.createElement(
                         'div',
-                        { className: "LazyAsset__Wrapper", style: _extends({}, styles.LazyAsset__Wrapper, extraStyles) },
-                        _react2.default.createElement(
-                            'div',
-                            { className: "LazyAsset__WrapperOverflow",
-                                style: _extends({}, styles.LazyAsset__WrapperOverflow, { transition: 'opacity ' + this.props.animationTime + 's', opacity: this.state.status === 3 ? 1 : 0 }) },
-                            this.props.images.length > 0 && _react2.default.createElement('img', {
-                                style: styles.img,
-                                sizes: this.props.sizes,
-                                alt: this.props.alt,
-                                srcSet: this.state.status >= 2 ? this._getSrcset(this.props.images) : '',
-                                onLoad: this.handleImageLoaded
-                            })
-                        ),
-                        this.props.children
-                    )
+                        { className: "LazyAsset__WrapperOverflow",
+                            style: _extends({}, styles.LazyAsset__WrapperOverflow, { transition: 'opacity ' + this.props.animationTime + 's', opacity: this.state.status === 3 ? 1 : 0 }) },
+                        this.props.images.length > 0 && _react2.default.createElement('img', {
+                            style: styles.img,
+                            sizes: this.props.sizes,
+                            alt: this.props.alt,
+                            srcSet: this.state.status >= 2 ? this._getSrcset(this.props.images) : '',
+                            onLoad: this.handleImageLoaded
+                        })
+                    ),
+                    this.props.children
                 )
             );
         }
@@ -529,6 +525,18 @@ function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
+}
+
+function normalizeRect (rect) {
+  if (rect.width === undefined) {
+    rect.width = rect.right - rect.left;
+  }
+
+  if (rect.height === undefined) {
+    rect.height = rect.bottom - rect.top;
+  }
+
+  return rect;
 }
 
 module.exports = createReactClass({
@@ -616,6 +624,10 @@ module.exports = createReactClass({
     } else if (!nextProps.active) {
       this.stopWatching();
     }
+  },
+
+  componentDidUpdate: function (prevProps) {
+    this.node = ReactDOM.findDOMNode(this);
   },
 
   getContainer: function () {
@@ -710,6 +722,15 @@ module.exports = createReactClass({
     if (this.interval) { this.interval = clearInterval(this.interval); }
   },
 
+  roundRectDown: function (rect) {
+    return {
+      top: Math.floor(rect.top),
+      left: Math.floor(rect.left),
+      bottom: Math.floor(rect.bottom),
+      right: Math.floor(rect.right),
+    };
+  },
+
   /**
    * Check if the element is within the visible viewport
    */
@@ -722,7 +743,7 @@ module.exports = createReactClass({
       return this.state;
     }
 
-    rect = el.getBoundingClientRect();
+    rect = normalizeRect(this.roundRectDown(el.getBoundingClientRect()));
 
     if (this.props.containment) {
       var containmentDOMRect = this.props.containment.getBoundingClientRect();
@@ -758,7 +779,10 @@ module.exports = createReactClass({
       right: rect.right <= containmentRect.right
     };
 
+    var hasSize = rect.height > 0 && rect.width > 0;
+
     var isVisible = (
+      hasSize &&
       visibilityRect.top &&
       visibilityRect.left &&
       visibilityRect.bottom &&
@@ -766,7 +790,7 @@ module.exports = createReactClass({
     );
 
     // check for partial visibility
-    if (this.props.partialVisibility) {
+    if (hasSize && this.props.partialVisibility) {
       var partialVisible =
           rect.top <= containmentRect.bottom && rect.bottom >= containmentRect.top &&
           rect.left <= containmentRect.right && rect.right >= containmentRect.left;

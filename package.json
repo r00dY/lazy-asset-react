@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "storybook": "start-storybook -p 6006 -s ./stories/public",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "webpack": "webpack"
   },
   "dependencies": {
     "babel-preset-es2015": "^6.24.1",
