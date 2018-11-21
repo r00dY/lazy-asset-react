@@ -152,6 +152,16 @@ class LazyAssetStory__LoadOnScroll extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            load: false
+        }
+    }
+
+    componentDidMount() {
+        this.setState({
+            load: true
+        });
     }
 
     render() {
@@ -175,7 +185,7 @@ class LazyAssetStory__LoadOnScroll extends React.Component {
                         marginBottom: "40px"
                     }}
 
-                    load={true}
+                    load={this.props.load ? this.props.load : this.state.load} // if we pass "load=true" then image is preloaded
                     loadWhenInViewport={true}
                     offset={this.props.offset}
                 />
@@ -188,4 +198,7 @@ class LazyAssetStory__LoadOnScroll extends React.Component {
 storiesOf('LazyAsset', module)
     .add('options', () => <LazyAssetStory__Options/>)
     .add('load on scroll', () => <LazyAssetStory__LoadOnScroll/>)
-    .add('load on scroll (with 100vh offset)', () => <LazyAssetStory__LoadOnScroll offset={{top: -window.innerHeight, bottom: -window.innerHeight}}/>);
+    .add('load on scroll (with 100vh offset)', () => <LazyAssetStory__LoadOnScroll offset={{top: -window.innerHeight, bottom: -window.innerHeight}}/>)
+    .add('load on scroll (all images preloaded)', () => <LazyAssetStory__LoadOnScroll load={true}/>);
+
+
