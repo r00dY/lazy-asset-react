@@ -24,7 +24,7 @@
     "babel-runtime": "^6.26.0",
     "babel-preset-es2015": "^6.24.1"
   },
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "dist/LazyAsset.js",
   "repository": {
     "type": "git",
