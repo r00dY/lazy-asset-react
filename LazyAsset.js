@@ -19,7 +19,6 @@ const styles = {
     LazyAsset__Wrapper: {
         position: "relative",
         width: "100%",
-        height: "100%",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat"
     },
@@ -39,6 +38,7 @@ const styles = {
         height: "100%",
         objectFit: "cover",
         objectPosition: "50% 50%",
+
         // IE fallback
         backgroundPosition: "center center",
         backgroundSize: "cover"
@@ -61,6 +61,44 @@ class LazyAsset extends React.Component {
         this.wrapper = React.createRef();
         this.handleImageLoaded = this.handleImageLoaded.bind(this);
         this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
+
+        this.randomId = btoa(Math.random()).substring(0,12);
+    }
+
+    _extractMediaFromInputParameters() {
+        if (this.props.media) {
+            // We check if mode, images are set locally. If not, we take it from main options. If not there -> error.
+            this.props.media.forEach((entry) => {
+                if (!entry.images && !this.props.images) {
+                    throw new Error('LazyAsset doesnt have "images" given');
+                }
+                else if (!entry.images) {
+                    entry.images = this.props.images;
+                }
+
+                if (!entry.mode && !this.props.mode) {
+                    throw new Error('LazyAsset doesnt have "mode" given');
+                }
+                else if (!entry.mode) {
+                    entry.mode = this.props.mode;
+                }
+
+                if (!entry.media) {
+                    throw new Error('LazyAsset doesnt have "media" given in "media" array');
+                }
+            });
+
+            return this.props.media;
+        }
+        else {
+            return [
+                {
+                    media: "screen",
+                    images: this.props.images,
+                    mode: this.props.mode
+                }
+            ]
+        }
     }
 
     _getSrcset(images) {
@@ -103,22 +141,72 @@ class LazyAsset extends React.Component {
     }
 
     render() {
-        // Extra styles for LazyAsset__Wrapper
+        // different modes for different resolutions!
+        let styleTag = null;
+        let imgTag = null;
         let extraStyles = {};
-        if (this.props.mode === "natural") {
-            extraStyles.paddingBottom = `${(this.props.images[0].h / this.props.images[0].w * 100)}%`;
-            extraStyles.height = "auto";
-        }
+
+        // Extra styles like placeholder or backgroundColor
         if (this.props.placeholder) {
             extraStyles.backgroundImage = `url(${this.props.placeholder})`;
         }
         if (this.props.backgroundColor) {
             extraStyles.backgroundColor = this.props.backgroundColor;
         }
+
+        // In case media parameter is given
+        if (this.props.media) {
+            let media = this._extractMediaFromInputParameters();
+
+            let responsiveStyle = "";
+            media.forEach((entry) => {
+                responsiveStyle += `@media ${entry.media} {
+                ${`.LazyAsset__Wrapper-${this.randomId} {`}
+                    ${entry.mode === "natural" ? `padding-bottom: ${(entry.images[0].h / entry.images[0].w * 100)}%;` : ''}
+                    ${entry.mode === "natural" ? 'height: auto;' : ''}
+                    ${entry.mode === "cover" ? 'padding-bottom: auto;' : ''}
+                    ${entry.mode === "cover" ? 'height: 100%;' : ''}
+                }
+            }
+            `
+            });
+
+            styleTag = <style dangerouslySetInnerHTML={{__html: responsiveStyle}} />
+
+            imgTag = <picture>
+                {[...media].reverse().map((entry) => <source srcSet={this.state.status >= 2 ? this._getSrcset(entry.images) : ''} sizes={this.props.sizes} media={entry.media} />)}
+                <img alt={this.props.alt} src={this.props.fallbackSrc}
+                     style={styles.img}
+                     ref={this.image}
+                     onLoad={this.handleImageLoaded}/>
+            </picture>
+        }
+        else {
+            if (this.props.mode === "natural") {
+                extraStyles.paddingBottom = `${(this.props.images[0].h / this.props.images[0].w * 100)}%`;
+                extraStyles.height = "auto";
+            }
+            else if (this.props.mode === "cover") {
+                extraStyles.height = "100%";
+            }
+
+            if (this.props.images.length > 0) {
+                imgTag = <img
+                    ref={this.image}
+                    style={styles.img}
+                    sizes={this.props.sizes}
+                    alt={this.props.alt}
+                    srcSet={this.state.status >= 2 ? this._getSrcset(this.props.images) : ''}
+                    onLoad={this.handleImageLoaded}
+                />
+            }
+        }
+
+        // Tag picking. Picture (for responsive image sets) or img
+
         return <div className={`LazyAsset ${this.props.className}`} style={{...styles.LazyAsset, ...this.props.style}}>
-            <VisibilitySensor onChange={this.handleVisibilityChange} partialVisibility={true}
-                              offset={this.props.offset}>
-                <div ref={this.wrapper} className={"LazyAsset__Wrapper"}
+            <VisibilitySensor onChange={this.handleVisibilityChange} partialVisibility={true} offset={this.props.offset}>
+                <div ref={this.wrapper} className={`LazyAsset__Wrapper LazyAsset__Wrapper-${this.randomId}`}
                      style={{...styles.LazyAsset__Wrapper, ...extraStyles}}>
                     <div className={"LazyAsset__WrapperOverflow"}
                          style={{
@@ -126,17 +214,9 @@ class LazyAsset extends React.Component {
                              transition: `opacity ${this.props.animationTime}s`,
                              opacity: this.state.status === 3 ? 1 : 0
                          }}>
-                        {this.props.images.length > 0 &&
-                        <img
-                            ref={this.image}
-                            style={styles.img}
-                            sizes={this.props.sizes}
-                            alt={this.props.alt}
-                            srcSet={this.state.status >= 2 ? this._getSrcset(this.props.images) : ''}
-                            onLoad={this.handleImageLoaded}
-                        />
-                        }
+                        {imgTag}
                     </div>
+                    { styleTag }
                     {this.props.children}
                 </div>
             </VisibilitySensor>
@@ -145,15 +225,20 @@ class LazyAsset extends React.Component {
 }
 
 LazyAsset.propTypes = {
-    mode: PropTypes.oneOf(["cover", "natural"]).isRequired,
+    mode: PropTypes.oneOf(["cover", "natural"]),
+    images: PropTypes.arrayOf(PropTypes.object),
+    media: PropTypes.arrayOf(PropTypes.object),
+
+    fallbackSrc: PropTypes.string,
+
     className: PropTypes.string,
     style: PropTypes.object,
+
     animationTime: PropTypes.number,
     placeholder: PropTypes.string,
     loadWhenInViewport: PropTypes.bool,
     sizes: PropTypes.string,
     alt: PropTypes.string,
-    images: PropTypes.arrayOf(PropTypes.object),
     loaded: PropTypes.bool,
     backgroundColor: PropTypes.string,
     offset: PropTypes.object,
