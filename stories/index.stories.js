@@ -107,8 +107,41 @@ function renderAllModes(options, loaded) {
 
                 {...options}
             />
+            <h3>Contain (landscape)</h3>
+            <LazyAsset
+                mode={"contain"}
+                sizes={"100vw"}
+                alt={"alternative text"}
+                images={CAT_LANDSCAPE}
 
-            <h3>Natural (small res), cover (big ones)</h3>
+                style={{
+                    width: "600px",
+                    height: "600px"
+                }}
+
+                load={loaded}
+
+                {...options}
+            />
+
+            <h3>Contain (portrait)</h3>
+            <LazyAsset
+                mode={"contain"}
+                sizes={"100vw"}
+                alt={"alternative text"}
+                images={CAT_PORTRAIT}
+
+                style={{
+                    width: "600px",
+                    height: "600px"
+                }}
+
+                load={loaded}
+
+                {...options}
+            />
+
+            <h3>Cover (to 1000px), natural (to 1500px), contain (from 1500px)</h3>
             <LazyAsset
                 media={[
                     {
@@ -119,6 +152,11 @@ function renderAllModes(options, loaded) {
                     {
                         media: "screen and (min-width: 1000px)",
                         mode: "natural",
+                        images: CAT_LANDSCAPE
+                    },
+                    {
+                        media: "screen and (min-width: 1500px)",
+                        mode: "contain",
                         images: CAT_LANDSCAPE
                     }
                 ]}

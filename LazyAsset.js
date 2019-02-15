@@ -9,7 +9,6 @@ import VisibilitySensor from 'react-visibility-sensor';
  * - contain mode
  * - IE / Edge fallbacks
  * - onLoad callbacks
- * - picture (different images and modes per media query)
  * - lazy video
  */
 const styles = {
@@ -36,7 +35,6 @@ const styles = {
         left: "0",
         width: "100%",
         height: "100%",
-        objectFit: "cover",
         objectPosition: "50% 50%",
 
         // IE fallback
@@ -144,15 +142,10 @@ class LazyAsset extends React.Component {
         // different modes for different resolutions!
         let styleTag = null;
         let imgTag = null;
-        let extraStyles = {};
+        let wrapperStyles = {};
+        let imgStyles = {};
 
         // Extra styles like placeholder or backgroundColor
-        if (this.props.placeholder) {
-            extraStyles.backgroundImage = `url(${this.props.placeholder})`;
-        }
-        if (this.props.backgroundColor) {
-            extraStyles.backgroundColor = this.props.backgroundColor;
-        }
 
         // In case media parameter is given
         if (this.props.media) {
@@ -161,43 +154,63 @@ class LazyAsset extends React.Component {
             let responsiveStyle = "";
             media.forEach((entry) => {
                 responsiveStyle += `@media ${entry.media} {
-                ${`.LazyAsset__Wrapper-${this.randomId} {`}
-                    ${entry.mode === "natural" ? `padding-bottom: ${(entry.images[0].h / entry.images[0].w * 100)}%;` : ''}
-                    ${entry.mode === "natural" ? 'height: auto;' : ''}
-                    ${entry.mode === "cover" ? 'padding-bottom: auto;' : ''}
-                    ${entry.mode === "cover" ? 'height: 100%;' : ''}
+                ${`.w-${this.randomId} {`}
+                    ${entry.mode === "natural" ? `padding-bottom: ${(entry.images[0].h / entry.images[0].w * 100)}%;` : 'padding-bottom: initial;'}
+                    ${entry.mode === "natural" ? 'height: auto;' : 'height: 100%;'}
+                    
+                    ${entry.mode !== "contain" && this.props.placeholder ? `background-image: url(${this.props.placeholder});` : 'background-image: none;'}
+                    ${entry.mode !== "contain" && this.props.backgroundColor ? `background-color: ${this.props.backgroundColor}` : 'background-color: transparent;'}
+                }
+                ${`.i-${this.randomId}`} {
+                    ${entry.mode === "contain" ? 'object-fit: contain;' : 'object-fit: cover'}
                 }
             }
             `
             });
 
-            styleTag = <style dangerouslySetInnerHTML={{__html: responsiveStyle}} />
+            styleTag = <style dangerouslySetInnerHTML={{__html: responsiveStyle}} />;
 
             imgTag = <picture>
                 {[...media].reverse().map((entry) => <source srcSet={this.state.status >= 2 ? this._getSrcset(entry.images) : ''} sizes={this.props.sizes} media={entry.media} />)}
-                <img alt={this.props.alt} src={this.props.fallbackSrc}
+                <img alt={this.props.alt}
+                     src={this.props.fallbackSrc}
+                     className={`i-${this.randomId}`}
                      style={styles.img}
                      ref={this.image}
                      onLoad={this.handleImageLoaded}/>
             </picture>
         }
         else {
+            if (this.props.placeholder) {
+                wrapperStyles.backgroundImage = `url(${this.props.placeholder})`;
+            }
+            if (this.props.backgroundColor) {
+                wrapperStyles.backgroundColor = this.props.backgroundColor;
+            }
+
             if (this.props.mode === "natural") {
-                extraStyles.paddingBottom = `${(this.props.images[0].h / this.props.images[0].w * 100)}%`;
-                extraStyles.height = "auto";
+                wrapperStyles.paddingBottom = `${(this.props.images[0].h / this.props.images[0].w * 100)}%`;
+                wrapperStyles.height = "auto";
+                imgStyles.objectFit = "cover";
             }
             else if (this.props.mode === "cover") {
-                extraStyles.height = "100%";
+                wrapperStyles.height = "100%";
+                imgStyles.objectFit = "cover";
+            }
+            else if (this.props.mode === "contain") {
+                wrapperStyles.height = "100%";
+                imgStyles.objectFit = "contain";
             }
 
             if (this.props.images.length > 0) {
                 imgTag = <img
                     ref={this.image}
-                    style={styles.img}
+                    style={{...styles.img, ...imgStyles }}
                     sizes={this.props.sizes}
                     alt={this.props.alt}
                     srcSet={this.state.status >= 2 ? this._getSrcset(this.props.images) : ''}
                     onLoad={this.handleImageLoaded}
+                    className={`i-${this.randomId}`}
                 />
             }
         }
@@ -206,8 +219,8 @@ class LazyAsset extends React.Component {
 
         return <div className={`LazyAsset ${this.props.className}`} style={{...styles.LazyAsset, ...this.props.style}}>
             <VisibilitySensor onChange={this.handleVisibilityChange} partialVisibility={true} offset={this.props.offset}>
-                <div ref={this.wrapper} className={`LazyAsset__Wrapper LazyAsset__Wrapper-${this.randomId}`}
-                     style={{...styles.LazyAsset__Wrapper, ...extraStyles}}>
+                <div ref={this.wrapper} className={`LazyAsset__Wrapper w-${this.randomId}`}
+                     style={{...styles.LazyAsset__Wrapper, ...wrapperStyles}}>
                     <div className={"LazyAsset__WrapperOverflow"}
                          style={{
                              ...styles.LazyAsset__WrapperOverflow,
