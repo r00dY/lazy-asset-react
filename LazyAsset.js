@@ -147,6 +147,7 @@ class LazyAsset extends React.Component {
 
         // Extra styles like placeholder or backgroundColor
 
+
         // In case media parameter is given
         if (this.props.media) {
             let media = this._extractMediaFromInputParameters();
@@ -158,8 +159,9 @@ class LazyAsset extends React.Component {
                     ${entry.mode === "natural" ? `padding-bottom: ${(entry.images[0].h / entry.images[0].w * 100)}%;` : 'padding-bottom: initial;'}
                     ${entry.mode === "natural" ? 'height: auto;' : 'height: 100%;'}
                     
-                    ${entry.mode !== "contain" && this.props.placeholder ? `background-image: url(${this.props.placeholder});` : 'background-image: none;'}
                     ${entry.mode !== "contain" && this.props.backgroundColor ? `background-color: ${this.props.backgroundColor}` : 'background-color: transparent;'}
+                    ${entry.mode !== "contain" && this.props.placeholder ? `background-image: ${this.props.placeholder}` : `background-image: none`}
+
                 }
                 ${`.i-${this.randomId}`} {
                     ${entry.mode === "contain" ? 'object-fit: contain;' : 'object-fit: cover'}
@@ -181,12 +183,14 @@ class LazyAsset extends React.Component {
             </picture>
         }
         else {
-            if (this.props.placeholder) {
-                wrapperStyles.backgroundImage = `url(${this.props.placeholder})`;
-            }
-            if (this.props.backgroundColor) {
+            if (this.props.backgroundColor && this.props.mode !== "contain") {
                 wrapperStyles.backgroundColor = this.props.backgroundColor;
             }
+
+            if (this.props.placeholder && this.props.mode !== "contain") {
+                wrapperStyles.backgroundImage = `url(${this.props.placeholder})`;
+            }
+
 
             if (this.props.mode === "natural") {
                 wrapperStyles.paddingBottom = `${(this.props.images[0].h / this.props.images[0].w * 100)}%`;
