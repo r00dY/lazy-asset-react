@@ -176,7 +176,8 @@ class LazyAsset extends React.Component {
                      className={`i-${this.randomId}`}
                      style={styles.img}
                      ref={this.image}
-                     onLoad={this.handleImageLoaded}/>
+                     onLoad={this.handleImageLoaded}
+                     draggable={this.props.draggable}/>
             </picture>
         }
         else {
@@ -212,6 +213,7 @@ class LazyAsset extends React.Component {
                     srcSet={this.state.status >= 2 ? this._getSrcset(this.props.images) : ''}
                     onLoad={this.handleImageLoaded}
                     className={`i-${this.randomId}`}
+                    draggable={this.props.draggable}
                 />
             }
         }
@@ -256,6 +258,7 @@ LazyAsset.propTypes = {
     loaded: PropTypes.bool,
     backgroundColor: PropTypes.string,
     offset: PropTypes.object,
+    draggable: PropTypes.bool
 };
 
 LazyAsset.defaultProps = {
@@ -267,7 +270,8 @@ LazyAsset.defaultProps = {
     images: [],
     load: false,
     backgroundColor: "lightgrey",
-    offset: {top: 0, bottom: 0}
+    offset: {top: 0, bottom: 0},
+    draggable: false
 };
 
 export default LazyAsset;
