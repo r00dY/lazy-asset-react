@@ -3,14 +3,10 @@ import PropTypes from 'prop-types';
 import VisibilitySensor from 'react-visibility-sensor';
 
 /**
- * TODO:
- *
- * - videos
- * - contain mode
- * - IE / Edge fallbacks
- * - onLoad callbacks
- * - picture (different images and modes per media query)
- * - lazy video
+ * TODO: video support
+ * TODO: contain mode should work well with placeholders, extraContent and background
+ * TODO: IE / Edge fallbacks
+ * TODO: onLoad callbacks
  */
 const styles = {
     LazyAsset: {
@@ -19,7 +15,6 @@ const styles = {
     LazyAsset__Wrapper: {
         position: "relative",
         width: "100%",
-        height: "100%",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat"
     },
@@ -37,8 +32,8 @@ const styles = {
         left: "0",
         width: "100%",
         height: "100%",
-        objectFit: "cover",
         objectPosition: "50% 50%",
+
         // IE fallback
         backgroundPosition: "center center",
         backgroundSize: "cover"
@@ -61,6 +56,44 @@ class LazyAsset extends React.Component {
         this.wrapper = React.createRef();
         this.handleImageLoaded = this.handleImageLoaded.bind(this);
         this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
+
+        this.randomId = btoa(Math.random()).substring(0,12);
+    }
+
+    _extractMediaFromInputParameters() {
+        if (this.props.media) {
+            // We check if mode, images are set locally. If not, we take it from main options. If not there -> error.
+            this.props.media.forEach((entry) => {
+                if (!entry.images && !this.props.images) {
+                    throw new Error('LazyAsset doesnt have "images" given');
+                }
+                else if (!entry.images) {
+                    entry.images = this.props.images;
+                }
+
+                if (!entry.mode && !this.props.mode) {
+                    throw new Error('LazyAsset doesnt have "mode" given');
+                }
+                else if (!entry.mode) {
+                    entry.mode = this.props.mode;
+                }
+
+                if (!entry.media) {
+                    throw new Error('LazyAsset doesnt have "media" given in "media" array');
+                }
+            });
+
+            return this.props.media;
+        }
+        else {
+            return [
+                {
+                    media: "screen",
+                    images: this.props.images,
+                    mode: this.props.mode
+                }
+            ]
+        }
     }
 
     _getSrcset(images) {
@@ -103,40 +136,101 @@ class LazyAsset extends React.Component {
     }
 
     render() {
-        // Extra styles for LazyAsset__Wrapper
-        let extraStyles = {};
-        if (this.props.mode === "natural") {
-            extraStyles.paddingBottom = `${(this.props.images[0].h / this.props.images[0].w * 100)}%`;
-            extraStyles.height = "auto";
+        // different modes for different resolutions!
+        let styleTag = null;
+        let imgTag = null;
+        let wrapperStyles = {};
+        let imgStyles = {};
+
+        // Extra styles like placeholder or backgroundColor
+
+
+        // In case media parameter is given
+        if (this.props.media) {
+            let media = this._extractMediaFromInputParameters();
+
+            let responsiveStyle = "";
+            media.forEach((entry) => {
+                responsiveStyle += `@media ${entry.media} {
+                ${`.w-${this.randomId} {`}
+                    ${entry.mode === "natural" ? `padding-bottom: ${(entry.images[0].h / entry.images[0].w * 100)}%;` : 'padding-bottom: initial;'}
+                    ${entry.mode === "natural" ? 'height: auto;' : 'height: 100%;'}
+                    
+                    ${entry.mode !== "contain" && this.props.backgroundColor ? `background-color: ${this.props.backgroundColor}` : 'background-color: transparent;'}
+                    ${entry.mode !== "contain" && this.props.placeholder ? `background-image: ${this.props.placeholder}` : `background-image: none`}
+
+                }
+                ${`.i-${this.randomId}`} {
+                    ${entry.mode === "contain" ? 'object-fit: contain;' : 'object-fit: cover'}
+                }
+            }
+            `
+            });
+
+            styleTag = <style dangerouslySetInnerHTML={{__html: responsiveStyle}} />;
+
+            imgTag = <picture>
+                {[...media].reverse().map((entry) => <source srcSet={this.state.status >= 2 ? this._getSrcset(entry.images) : ''} sizes={this.props.sizes} media={entry.media} />)}
+                <img alt={this.props.alt}
+                     src={this.props.fallbackSrc}
+                     className={`i-${this.randomId}`}
+                     style={styles.img}
+                     ref={this.image}
+                     onLoad={this.handleImageLoaded}/>
+            </picture>
         }
-        if (this.props.placeholder) {
-            extraStyles.backgroundImage = `url(${this.props.placeholder})`;
+        else {
+            if (this.props.backgroundColor && this.props.mode !== "contain") {
+                wrapperStyles.backgroundColor = this.props.backgroundColor;
+            }
+
+            if (this.props.placeholder && this.props.mode !== "contain") {
+                wrapperStyles.backgroundImage = `url(${this.props.placeholder})`;
+            }
+
+
+            if (this.props.mode === "natural") {
+                wrapperStyles.paddingBottom = `${(this.props.images[0].h / this.props.images[0].w * 100)}%`;
+                wrapperStyles.height = "auto";
+                imgStyles.objectFit = "cover";
+            }
+            else if (this.props.mode === "cover") {
+                wrapperStyles.height = "100%";
+                imgStyles.objectFit = "cover";
+            }
+            else if (this.props.mode === "contain") {
+                wrapperStyles.height = "100%";
+                imgStyles.objectFit = "contain";
+            }
+
+            if (this.props.images.length > 0) {
+                imgTag = <img
+                    ref={this.image}
+                    style={{...styles.img, ...imgStyles }}
+                    sizes={this.props.sizes}
+                    alt={this.props.alt}
+                    srcSet={this.state.status >= 2 ? this._getSrcset(this.props.images) : ''}
+                    onLoad={this.handleImageLoaded}
+                    className={`i-${this.randomId}`}
+                />
+            }
         }
-        if (this.props.backgroundColor) {
-            extraStyles.backgroundColor = this.props.backgroundColor;
-        }
+
+        // Tag picking. Picture (for responsive image sets) or img
+
         return <div className={`LazyAsset ${this.props.className}`} style={{...styles.LazyAsset, ...this.props.style}}>
-            <VisibilitySensor onChange={this.handleVisibilityChange} partialVisibility={true}
-                              offset={this.props.offset}>
-                <div ref={this.wrapper} className={"LazyAsset__Wrapper"}
-                     style={{...styles.LazyAsset__Wrapper, ...extraStyles}}>
+            <VisibilitySensor onChange={this.handleVisibilityChange} partialVisibility={true} offset={this.props.offset}>
+                <div ref={this.wrapper} className={`LazyAsset__Wrapper w-${this.randomId}`}
+                     style={{...styles.LazyAsset__Wrapper, ...wrapperStyles}}>
                     <div className={"LazyAsset__WrapperOverflow"}
                          style={{
                              ...styles.LazyAsset__WrapperOverflow,
                              transition: `opacity ${this.props.animationTime}s`,
                              opacity: this.state.status === 3 ? 1 : 0
                          }}>
-                        {this.props.images.length > 0 &&
-                        <img
-                            ref={this.image}
-                            style={styles.img}
-                            sizes={this.props.sizes}
-                            alt={this.props.alt}
-                            srcSet={this.state.status >= 2 ? this._getSrcset(this.props.images) : ''}
-                            onLoad={this.handleImageLoaded}
-                        />
-                        }
+                        {imgTag}
                     </div>
+                    { styleTag }
                     {this.props.children}
                 </div>
             </VisibilitySensor>
@@ -145,15 +239,20 @@ class LazyAsset extends React.Component {
 }
 
 LazyAsset.propTypes = {
-    mode: PropTypes.oneOf(["cover", "natural"]).isRequired,
+    mode: PropTypes.oneOf(["cover", "natural"]),
+    images: PropTypes.arrayOf(PropTypes.object),
+    media: PropTypes.arrayOf(PropTypes.object),
+
+    fallbackSrc: PropTypes.string,
+
     className: PropTypes.string,
     style: PropTypes.object,
+
     animationTime: PropTypes.number,
     placeholder: PropTypes.string,
     loadWhenInViewport: PropTypes.bool,
     sizes: PropTypes.string,
     alt: PropTypes.string,
-    images: PropTypes.arrayOf(PropTypes.object),
     loaded: PropTypes.bool,
     backgroundColor: PropTypes.string,
     offset: PropTypes.object,

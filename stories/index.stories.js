@@ -37,6 +37,25 @@ const CAT_LANDSCAPE = [
     }
 ];
 
+const CAT_PORTRAIT = [
+    {
+        url: "/cat/cat_p420.png",
+        w: 420,
+        h: 489
+    },
+    {
+        url: "/cat/cat_p768.png",
+        w: 768,
+        h: 894
+    },
+    {
+        url: "/cat/cat_p920.png",
+        w: 1024,
+        h: 1071
+    }
+];
+
+
 const styles = {
     imageLabel: {
         position: "absolute",
@@ -88,6 +107,73 @@ function renderAllModes(options, loaded) {
 
                 {...options}
             />
+            <h3>Contain (landscape)</h3>
+            <LazyAsset
+                mode={"contain"}
+                sizes={"100vw"}
+                alt={"alternative text"}
+                images={CAT_LANDSCAPE}
+
+                style={{
+                    width: "600px",
+                    height: "600px"
+                }}
+
+                load={loaded}
+
+                {...options}
+            />
+
+            <h3>Contain (portrait)</h3>
+            <LazyAsset
+                mode={"contain"}
+                sizes={"100vw"}
+                alt={"alternative text"}
+                images={CAT_PORTRAIT}
+
+                style={{
+                    width: "600px",
+                    height: "600px"
+                }}
+
+                load={loaded}
+
+                {...options}
+            />
+
+            <h3>Cover (to 1000px), natural (to 1500px), contain (from 1500px)</h3>
+            <LazyAsset
+                media={[
+                    {
+                        media: "screen",
+                        mode: "cover",
+                        images: CAT_PORTRAIT
+                    },
+                    {
+                        media: "screen and (min-width: 1000px)",
+                        mode: "natural",
+                        images: CAT_LANDSCAPE
+                    },
+                    {
+                        media: "screen and (min-width: 1500px)",
+                        mode: "contain",
+                        images: CAT_LANDSCAPE
+                    }
+                ]}
+                sizes={"100vw"}
+                alt={"alternative text"}
+
+                style={{
+                    width: "600px",
+                    height: "600px",
+                    border: "1px solid black"
+                }}
+
+                load={loaded}
+
+                {...options}
+            />
+
         </div>
     );
 }
