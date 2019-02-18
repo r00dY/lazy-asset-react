@@ -294,7 +294,8 @@ var LazyAsset = function (_React$Component) {
                         className: 'i-' + this.randomId,
                         style: styles.img,
                         ref: this.image,
-                        onLoad: this.handleImageLoaded })
+                        onLoad: this.handleImageLoaded,
+                        draggable: this.props.draggable })
                 );
             } else {
                 if (this.props.backgroundColor && this.props.mode !== "contain") {
@@ -325,7 +326,8 @@ var LazyAsset = function (_React$Component) {
                         alt: this.props.alt,
                         srcSet: this.state.status >= 2 ? this._getSrcset(this.props.images) : '',
                         onLoad: this.handleImageLoaded,
-                        className: 'i-' + this.randomId
+                        className: 'i-' + this.randomId,
+                        draggable: this.props.draggable
                     });
                 }
             }
@@ -379,7 +381,8 @@ LazyAsset.propTypes = {
     alt: _propTypes2.default.string,
     loaded: _propTypes2.default.bool,
     backgroundColor: _propTypes2.default.string,
-    offset: _propTypes2.default.object
+    offset: _propTypes2.default.object,
+    draggable: _propTypes2.default.bool
 };
 
 LazyAsset.defaultProps = {
@@ -391,7 +394,8 @@ LazyAsset.defaultProps = {
     images: [],
     load: false,
     backgroundColor: "lightgrey",
-    offset: { top: 0, bottom: 0 }
+    offset: { top: 0, bottom: 0 },
+    draggable: false
 };
 
 exports.default = LazyAsset;
