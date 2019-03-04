@@ -365,7 +365,7 @@ var LazyAsset = function (_React$Component) {
 }(_react2.default.Component);
 
 LazyAsset.propTypes = {
-    mode: _propTypes2.default.oneOf(["cover", "natural"]),
+    mode: _propTypes2.default.oneOf(["cover", "natural", "contain"]),
     images: _propTypes2.default.arrayOf(_propTypes2.default.object),
     media: _propTypes2.default.arrayOf(_propTypes2.default.object),
 
