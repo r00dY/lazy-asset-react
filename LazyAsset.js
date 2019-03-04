@@ -241,7 +241,7 @@ class LazyAsset extends React.Component {
 }
 
 LazyAsset.propTypes = {
-    mode: PropTypes.oneOf(["cover", "natural"]),
+    mode: PropTypes.oneOf(["cover", "natural", "contain"]),
     images: PropTypes.arrayOf(PropTypes.object),
     media: PropTypes.arrayOf(PropTypes.object),
 
