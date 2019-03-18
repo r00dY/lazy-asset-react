@@ -176,7 +176,7 @@ var LazyAsset = function (_React$Component) {
         _this.handleImageLoaded = _this.handleImageLoaded.bind(_this);
         _this.handleVisibilityChange = _this.handleVisibilityChange.bind(_this);
 
-        _this.randomId = btoa(Math.random()).substring(0, 12);
+        _this.randomId = Math.random().toString(36).substr(2, 9);
         return _this;
     }
 

@@ -57,7 +57,7 @@ class LazyAsset extends React.Component {
         this.handleImageLoaded = this.handleImageLoaded.bind(this);
         this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
 
-        this.randomId = btoa(Math.random()).substring(0,12);
+        this.randomId = Math.random().toString(36).substr(2, 9);
     }
 
     _extractMediaFromInputParameters() {
